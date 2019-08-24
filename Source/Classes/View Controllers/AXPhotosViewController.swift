@@ -520,16 +520,60 @@ import FLAnimatedImage_tvOS
         if photoIndex < 0 || photoIndex > (self.dataSource.numberOfPhotos - 1) {
             return
         }
-        
+
         guard let photoViewController = self.makePhotoViewController(for: photoIndex) else { return }
-        
-        let forward = (photoIndex > self.currentPhotoIndex)
+
+        let forward = (photoIndex >= self.currentPhotoIndex)
         self.pageViewController.setViewControllers([photoViewController],
                                                    direction: forward ? .forward : .reverse,
                                                    animated: animated,
                                                    completion: nil)
         self.loadPhotos(at: photoIndex)
-        self.currentPhotoIndex = photoIndex
+    }
+
+    /// Удаление текущего фото при нахождении в галерее.
+    /// При наличии следующего фото, к нему будет произведен автоматический свайп.
+    /// Если фото последнее, и есть предыдущая фотография - свайп к предыдущей.
+    @objc public func removeCurrentPhoto() {
+        let index = self.currentPhotoIndex
+        let lastPhotoIndex = self.dataSource.numberOfPhotos - 1
+
+        if index < 0 || index > lastPhotoIndex {
+            return
+        }
+
+        if self.dataSource.numberOfPhotos == 1 {
+            self.dismiss(animated: true)
+
+            return
+        }
+
+        let isLastPhotoIndex = index == lastPhotoIndex
+
+        // Поскольку фото будет удалено, то индекс следующей фото станет равен текущему индексу.
+        var indexToNavigate = index
+
+        if isLastPhotoIndex {
+            indexToNavigate = index - 1
+        }
+
+        self.dataSource.photos.remove(at: index)
+
+        // Фикс переключения индекса при удалении в середине.
+        if !isLastPhotoIndex, let currentPhotoViewController = currentPhotoViewController, let index = self.orderedViewControllers.firstIndex(of: currentPhotoViewController) {
+            self.orderedViewControllers.remove(at: index)
+        }
+
+        self.navigateToPhotoIndex(indexToNavigate, animated: true)
+
+        // Не срабатывает переключение индекса в contentOffsetContextDidUpdate. Вызываем вручную.
+        if !isLastPhotoIndex {
+            self.currentPhotoIndex = index
+
+            if let photo = self.dataSource.photo(at: index) {
+                self.didNavigateTo(photo: photo, at: index)
+            }
+        }
     }
     
     // MARK: - Page VC Configuration
@@ -559,11 +603,7 @@ import FLAnimatedImage_tvOS
         self.willUpdate(overlayView: self.overlayView, for: photo, at: photoIndex, totalNumberOfPhotos: self.dataSource.numberOfPhotos)
         
         #if os(iOS)
-        if self.dataSource.numberOfPhotos > 1 {
-            self.overlayView.internalTitle = String.localizedStringWithFormat(NSLocalizedString("%d of %d", comment: ""), photoIndex + 1, self.dataSource.numberOfPhotos)
-        } else {
-            self.overlayView.internalTitle = nil
-        }
+        self.overlayView.internalTitle = String.localizedStringWithFormat(NSLocalizedString("%d of %d", comment: ""), photoIndex + 1, self.dataSource.numberOfPhotos)
         #endif
         
         self.overlayView.updateCaptionView(photo: photo)

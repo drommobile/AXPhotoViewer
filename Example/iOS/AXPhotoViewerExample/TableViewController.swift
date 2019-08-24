@@ -20,7 +20,12 @@ class TableViewController: UITableViewController, AXPhotosViewControllerDelegate
     
     weak var photosViewController: AXPhotosViewController?
     weak var customView: UILabel?
-    
+
+//    let photos = [AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V4-1080.jpg")),
+//                  AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V6-1080.jpg")),
+//                  AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V5-1080.jpg")),
+//                  AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V1-1080.jpg"))]
+
     let photos = [
         AXPhoto(attributedTitle: NSAttributedString(
                 string: "Niagara Falls"),
@@ -180,7 +185,7 @@ class TableViewController: UITableViewController, AXPhotosViewControllerDelegate
             flex,
             UIBarButtonItem(customView: customView),
             flex,
-            UIBarButtonItem(barButtonSystemItem: .trash, target: nil, action: nil),
+            UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(removeCurrentPhoto)),
         ]
         bottomView.backgroundColor = .clear
         bottomView.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
@@ -194,6 +199,10 @@ class TableViewController: UITableViewController, AXPhotosViewControllerDelegate
         
         self.present(photosViewController, animated: true)
         self.photosViewController = photosViewController
+    }
+
+    @objc func removeCurrentPhoto() {
+        self.photosViewController?.removeCurrentPhoto()
     }
     
     // MARK: - AXPhotosViewControllerDelegate

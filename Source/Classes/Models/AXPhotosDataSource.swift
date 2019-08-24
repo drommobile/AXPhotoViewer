@@ -21,7 +21,7 @@
     @objc fileprivate(set) var prefetchBehavior: AXPhotosPrefetchBehavior
     
     /// The photos to display in the PhotosViewController.
-    fileprivate var photos: [AXPhotoProtocol]
+    var photos: [AXPhotoProtocol]
     
     // The initial photo index to display upon presentation.
     @objc fileprivate(set) var initialPhotoIndex: Int = 0
