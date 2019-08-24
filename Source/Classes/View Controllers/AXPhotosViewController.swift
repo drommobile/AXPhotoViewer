@@ -497,7 +497,7 @@ import FLAnimatedImage_tvOS
             let canceled = (self.view.window != nil)
             
             if canceled {
-                self.transitionController?.forceNonInteractiveDismissal = false
+                self.transitionController?.forceInteractiveDismissal = false
                 #if os(iOS)
                 self.panGestureRecognizer?.isEnabled = true
                 #endif
@@ -651,7 +651,7 @@ import FLAnimatedImage_tvOS
     #if os(iOS)
     @objc fileprivate func didPanWithGestureRecognizer(_ sender: UIPanGestureRecognizer) {
         if sender.state == .began {
-            self.transitionController?.forceNonInteractiveDismissal = false
+            self.transitionController?.forceInteractiveDismissal = true
             self.dismiss(animated: true, completion: nil)
         }
         
@@ -701,7 +701,7 @@ import FLAnimatedImage_tvOS
     }
     
     @objc public func closeAction(_ sender: UIBarButtonItem) {
-        self.transitionController?.forceNonInteractiveDismissal = true
+        self.transitionController?.forceInteractiveDismissal = false
         self.dismiss(animated: true)
     }
     #endif
