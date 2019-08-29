@@ -9,7 +9,7 @@
 import UIKit
 import AXPhotoViewer
 import FLAnimatedImage
-import PINRemoteImage
+import SDWebImage
 
 // This class contains some hacked together sample project code that I couldn't be arsed to make less ugly. ¯\_(ツ)_/¯
 class TableViewController: UITableViewController, AXPhotosViewControllerDelegate, UIViewControllerPreviewingDelegate {
@@ -21,12 +21,12 @@ class TableViewController: UITableViewController, AXPhotosViewControllerDelegate
     weak var photosViewController: AXPhotosViewController?
     weak var customView: UILabel?
 
-//    let photos = [AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V4-1080.jpg")),
-//                  AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V6-1080.jpg")),
-//                  AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V5-1080.jpg")),
-//                  AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V1-1080.jpg"))]
+    let photos = [AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V4-1080.jpg")),
+                  AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V6-1080.jpg")),
+                  AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V5-1080.jpg")),
+                  AXPhoto(url: URL(string: "https://www.wsupercars.com/wallpapers/Toyota/1984-Toyota-Celica-Supra-V1-1080.jpg"))]
 
-    let photos = [
+    let photos1 = [
         AXPhoto(attributedTitle: NSAttributedString(
                 string: "Niagara Falls"),
                 image: UIImage(named: "niagara-falls"
@@ -110,6 +110,16 @@ class TableViewController: UITableViewController, AXPhotosViewControllerDelegate
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: ReuseIdentifier)
         self.tableView.estimatedRowHeight = 350
         self.tableView.rowHeight = 350
+
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Clear cache",
+                                                                 style: .plain,
+                                                                 target: self,
+                                                                 action: #selector(clearCache))
+    }
+
+    @objc private func clearCache() {
+        SDImageCache.shared.clearMemory()
+        SDImageCache.shared.clearDisk()
     }
     
     override func viewWillLayoutSubviews() {
@@ -166,10 +176,10 @@ class TableViewController: UITableViewController, AXPhotosViewControllerDelegate
             return cell.contentView.viewWithTag(666) as? FLAnimatedImageView
         }
         
-        let container = UIViewController()
+        //let container = UIViewController()
         
         let dataSource = AXPhotosDataSource(photos: self.photos, initialPhotoIndex: indexPath.row)
-        let pagingConfig = AXPagingConfig(loadingViewClass: CustomLoadingView.self)
+        let pagingConfig = AXPagingConfig(loadingViewClass: nil)
         let photosViewController = AXPhotosViewController(dataSource: dataSource, pagingConfig: pagingConfig, transitionInfo: transitionInfo)
 //        photosViewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         photosViewController.delegate = self
@@ -265,29 +275,35 @@ class TableViewController: UITableViewController, AXPhotosViewControllerDelegate
                 }
             }
         }
-        
-        if let imageData = self.photos[indexPath.row].imageData {
-            onBackgroundThread {
-                let image = FLAnimatedImage(animatedGIFData: imageData)
-                onMainThread {
-                    imageView.animatedImage = image
-                    layoutImageView(with: image)
-                }
-            }
-        } else if let image = self.photos[indexPath.row].image {
-            onMainThread {
-                imageView.image = image
+
+        if let url = URL(string: "https://image.shutterstock.com/image-photo/large-beautiful-drops-transparent-rain-260nw-668593321.jpg") {
+            imageView.sd_setImage(with: url) { (image, error, cacheType, url) in
                 layoutImageView(with: image)
             }
-        } else if let url = self.photos[indexPath.row].url {
-            imageView.pin_setImage(from: url, placeholderImage: nil) { (result) in
-                layoutImageView(with: result.alternativeRepresentation ?? result.image)
-            }
         }
+        
+//        if let imageData = self.photos[indexPath.row].imageData {
+//            onBackgroundThread {
+//                let image = FLAnimatedImage(animatedGIFData: imageData)
+//                onMainThread {
+//                    imageView.animatedImage = image
+//                    layoutImageView(with: image)
+//                }
+//            }
+//        } else if let image = self.photos[indexPath.row].image {
+//            onMainThread {
+//                imageView.image = image
+//                layoutImageView(with: image)
+//            }
+//        } else if let url = self.photos[indexPath.row].url {
+//            imageView.sd_setImage(with: url) { (image, error, cacheType, url) in
+//                layoutImageView(with: image)
+//            }
+//        }
     }
     
     func cancelLoad(at indexPath: IndexPath, for imageView: FLAnimatedImageView) {
-        imageView.pin_cancelImageDownload()
+        imageView.sd_cancelCurrentImageLoad()
         imageView.animatedImage = nil
         imageView.image = nil
     }

@@ -140,6 +140,9 @@ import FLAnimatedImage_tvOS
     
     fileprivate var transitionController: AXPhotosTransitionController?
     fileprivate let notificationCenter = NotificationCenter()
+
+    /// Стартовая картинка. Чтобы не было скачка на черный экран с activityIndicator, если фото отсутствует в кэше.
+    private var startingImage: UIImage?
     
     // MARK: - Initialization
     @objc public init() {
@@ -310,7 +313,8 @@ import FLAnimatedImage_tvOS
         
         if let transitionInfo = transitionInfo {
             self.transitionInfo = transitionInfo
-            
+            self.startingImage = transitionInfo.startingView?.image
+
             #if os(iOS)
             if transitionInfo.interactiveDismissalEnabled {
                 self.panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPanWithGestureRecognizer(_:)))
@@ -763,7 +767,10 @@ import FLAnimatedImage_tvOS
         } else {
             guard let loadingView = self.makeLoadingView(for: pageIndex) else { return nil }
             
-            photoViewController = AXPhotoViewController(loadingView: loadingView, notificationCenter: self.notificationCenter)
+            photoViewController = AXPhotoViewController(loadingView: loadingView,
+                                                        notificationCenter: self.notificationCenter,
+                                                        startingImage: self.startingImage)
+            self.startingImage = nil
             photoViewController.addLifecycleObserver(self)
             photoViewController.delegate = self
             

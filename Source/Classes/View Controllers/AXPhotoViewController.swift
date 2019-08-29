@@ -29,10 +29,12 @@ import FLAnimatedImage_tvOS
     
     fileprivate var photo: AXPhotoProtocol?
     fileprivate weak var notificationCenter: NotificationCenter?
+    private var startingImage: UIImage?
     
-    @objc public init(loadingView: AXLoadingViewProtocol, notificationCenter: NotificationCenter) {
+    @objc public init(loadingView: AXLoadingViewProtocol, notificationCenter: NotificationCenter, startingImage: UIImage? = nil) {
         self.loadingView = loadingView
         self.notificationCenter = notificationCenter
+        self.startingImage = startingImage
         
         super.init(nibName: nil, bundle: nil)
         
@@ -97,8 +99,13 @@ import FLAnimatedImage_tvOS
         
         switch photo.ax_loadingState {
         case .loading, .notLoaded, .loadingCancelled:
-            resetImageView()
-            self.loadingView?.startLoading(initialProgress: photo.ax_progress)
+            if let startingImage = self.startingImage {
+                self.zoomingImageView.image = startingImage
+                self.startingImage = nil
+            } else {
+                resetImageView()
+                self.loadingView?.startLoading(initialProgress: photo.ax_progress)
+            }
         case .loadingFailed:
             resetImageView()
             let error = photo.ax_error ?? NSError()
