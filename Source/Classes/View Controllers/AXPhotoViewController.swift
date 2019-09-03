@@ -89,12 +89,6 @@ import FLAnimatedImage_tvOS
     @objc public func applyPhoto(_ photo: AXPhotoProtocol) {
         self.photo = photo
         
-        weak var weakSelf = self
-        func resetImageView() {
-            weakSelf?.zoomingImageView.image = nil
-            weakSelf?.zoomingImageView.animatedImage = nil
-        }
-        
         self.loadingView?.removeError()
         
         switch photo.ax_loadingState {
@@ -176,6 +170,8 @@ import FLAnimatedImage_tvOS
         } else if let referenceView = userInfo[AXPhotosViewControllerNotification.ReferenceViewKey] as? FLAnimatedImageView {
             self.zoomingImageView.imageView.ax_syncFrames(with: referenceView)
         } else if let error = userInfo[AXPhotosViewControllerNotification.ErrorKey] as? Error {
+            resetImageView()
+
             self.loadingView?.showError(error, retryHandler: { [weak self] in
                 guard let `self` = self, let photo = self.photo else { return }
                 self.delegate?.photoViewController(self, retryDownloadFor: photo)
@@ -188,6 +184,11 @@ import FLAnimatedImage_tvOS
         }
     }
 
+    // MARK: - Private
+    func resetImageView() {
+        self.zoomingImageView.image = nil
+        self.zoomingImageView.animatedImage = nil
+    }
 }
 
 @objc public protocol AXPhotoViewControllerDelegate: AnyObject, NSObjectProtocol {
