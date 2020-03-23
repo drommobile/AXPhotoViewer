@@ -55,14 +55,9 @@ class AFNetworkingIntegration: NSObject, AXNetworkIntegrationProtocol {
                     self.delegate?.networkIntegration(self, loadDidFinishWith: photo)
                 }
             } else {
-                let error = NSError(
-                    domain: AXNetworkIntegrationErrorDomain,
-                    code: AXNetworkIntegrationFailedToLoadErrorCode,
-                    userInfo: nil
-                )
                 AXDispatchUtils.executeInBackground { [weak self] in
                     guard let `self` = self else { return }
-                    self.delegate?.networkIntegration(self, loadDidFailWith: error, for: photo)
+                    self.delegate?.networkIntegration(self, loadDidFailWith: NSError.networkIntegrationError, for: photo)
                 }
             }
         }
@@ -72,14 +67,9 @@ class AFNetworkingIntegration: NSObject, AXNetworkIntegrationProtocol {
             
             self.downloadTasks.removeObject(forKey: photo)
             
-            let error = NSError(
-                domain: AXNetworkIntegrationErrorDomain,
-                code: AXNetworkIntegrationFailedToLoadErrorCode,
-                userInfo: nil
-            )
             AXDispatchUtils.executeInBackground { [weak self] in
                 guard let `self` = self else { return }
-                self.delegate?.networkIntegration(self, loadDidFailWith: error, for: photo)
+                self.delegate?.networkIntegration(self, loadDidFailWith: NSError.networkIntegrationError, for: photo)
             }
         }
         

@@ -54,14 +54,9 @@ class KingfisherIntegration: NSObject, AXNetworkIntegrationProtocol {
                     }
                 }
             case .failure(let error):
-                let error = NSError(
-                    domain: AXNetworkIntegrationErrorDomain,
-                    code: AXNetworkIntegrationFailedToLoadErrorCode,
-                    userInfo: ["description": error.errorDescription ?? ""]
-                )
                 AXDispatchUtils.executeInBackground { [weak self] in
                     guard let `self` = self else { return }
-                    self.delegate?.networkIntegration(self, loadDidFailWith: error, for: photo)
+                    self.delegate?.networkIntegration(self, loadDidFailWith: NSError.networkIntegrationError, for: photo)
                 }
             }
         }

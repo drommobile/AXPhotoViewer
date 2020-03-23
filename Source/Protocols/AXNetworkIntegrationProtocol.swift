@@ -6,9 +6,6 @@
 //  Copyright © 2017 Alex Hill. All rights reserved.
 //
 
-let AXNetworkIntegrationErrorDomain = "AXNetworkIntegrationErrorDomain"
-let AXNetworkIntegrationFailedToLoadErrorCode = 6
-
 @objc public protocol AXNetworkIntegrationProtocol: AnyObject, NSObjectProtocol {
     
     @objc var delegate: AXNetworkIntegrationDelegate? { get set }
