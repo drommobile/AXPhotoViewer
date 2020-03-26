@@ -8,15 +8,15 @@
 
 import UIKit
 
-@objc open class AXOverlayView: UIView, AXStackableViewContainerDelegate {
+@objcMembers open class AXOverlayView: UIView, AXStackableViewContainerDelegate {
     
     #if os(iOS)
     /// The toolbar used to set the `titleView`, `leftBarButtonItems`, `rightBarButtonItems`
-    @objc public let toolbar = UIToolbar(frame: CGRect(origin: .zero, size: CGSize(width: 320, height: 44)))
+    public let toolbar = UIToolbar(frame: CGRect(origin: .zero, size: CGSize(width: 320, height: 44)))
     
     /// The title view displayed in the toolbar. This view is sized and centered between the `leftBarButtonItems` and `rightBarButtonItems`.
     /// This is prioritized over `title`.
-    @objc public var titleView: AXOverlayTitleViewProtocol? {
+    public var titleView: AXOverlayTitleViewProtocol? {
         didSet {
             assert(self.titleView == nil ? true : self.titleView is UIView, "`titleView` must be a UIView.")
             
@@ -33,7 +33,7 @@ import UIKit
     
     /// The title displayed in the toolbar. This string is centered between the `leftBarButtonItems` and `rightBarButtonItems`.
     /// Overwrites `internalTitle`.
-    @objc public var title: String? {
+    public var title: String? {
         didSet {
             self.updateTitleBarButtonItem()
         }
@@ -48,17 +48,17 @@ import UIKit
     }
     
     /// The title text attributes inherited by the `title`.
-    @objc public var titleTextAttributes: [NSAttributedString.Key: Any]? {
+    public var titleTextAttributes: [NSAttributedString.Key: Any]? {
         didSet {
             self.updateTitleBarButtonItem()
         }
     }
     
     /// The bar button item used internally to display the `title` attribute in the toolbar.
-    let titleBarButtonItem = UIBarButtonItem(customView: UILabel())
+    public let titleBarButtonItem = UIBarButtonItem(customView: UILabel())
     
     /// The bar button item that appears in the top left corner of the overlay.
-    @objc public var leftBarButtonItem: UIBarButtonItem? {
+    public var leftBarButtonItem: UIBarButtonItem? {
         set(value) {
             if let value = value {
                 self.leftBarButtonItems = [value]
@@ -72,7 +72,7 @@ import UIKit
     }
     
     /// The bar button items that appear in the top left corner of the overlay.
-    @objc public var leftBarButtonItems: [UIBarButtonItem]? {
+    public var leftBarButtonItems: [UIBarButtonItem]? {
         didSet {
             if self.window == nil {
                 return
@@ -83,7 +83,7 @@ import UIKit
     }
     
     /// The bar button item that appears in the top right corner of the overlay.
-    @objc public var rightBarButtonItem: UIBarButtonItem? {
+    public var rightBarButtonItem: UIBarButtonItem? {
         set(value) {
             if let value = value {
                 self.rightBarButtonItems = [value]
@@ -97,7 +97,7 @@ import UIKit
     }
     
     /// The bar button items that appear in the top right corner of the overlay.
-    @objc public var rightBarButtonItems: [UIBarButtonItem]? {
+    public var rightBarButtonItems: [UIBarButtonItem]? {
         didSet {
             if self.window == nil {
                 return
@@ -109,7 +109,7 @@ import UIKit
     #endif
     
     /// The caption view to be used in the overlay.
-    @objc open var captionView: AXCaptionViewProtocol = AXCaptionView() {
+    open var captionView: AXCaptionViewProtocol = AXCaptionView() {
         didSet {
             guard let oldCaptionView = oldValue as? UIView else {
                 assertionFailure("`oldCaptionView` must be a UIView.")
@@ -129,7 +129,7 @@ import UIKit
     }
     
     /// Whether or not to animate `captionView` changes. Defaults to true.
-    @objc public var animateCaptionViewChanges: Bool = true {
+    public var animateCaptionViewChanges: Bool = true {
         didSet {
             self.captionView.animateCaptionInfoChanges = self.animateCaptionViewChanges
         }
@@ -145,11 +145,11 @@ import UIKit
     
     /// Container to embed all content anchored at the top of the `overlayView`.
     /// Add custom subviews to the top container in the order that you wish to stack them. These must be self-sizing views.
-    @objc public var topStackContainer: AXStackableViewContainer!
+    public var topStackContainer: AXStackableViewContainer!
     
     /// Container to embed all content anchored at the bottom of the `overlayView`.
     /// Add custom subviews to the bottom container in the order that you wish to stack them. These must be self-sizing views.
-    @objc public var bottomStackContainer: AXStackableViewContainer!
+    public var bottomStackContainer: AXStackableViewContainer!
     
     /// A flag that is set at the beginning and end of `OverlayView.setShowInterface(_:alongside:completion:)`
     fileprivate var isShowInterfaceAnimating = false
@@ -159,7 +159,7 @@ import UIKit
     
     fileprivate var isFirstLayout: Bool = true
     
-    @objc public init() {
+    public init() {
         super.init(frame: .zero)
         
         self.topStackContainer = AXStackableViewContainer(views: [], anchoredAt: .top)
